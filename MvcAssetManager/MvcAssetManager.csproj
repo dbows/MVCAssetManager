@@ -75,6 +75,7 @@
     <Compile Include="Areas\Assets\FileTransferHandler.ashx.cs">
       <DependentUpon>FileTransferHandler.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Areas\Assets\ITransferHandler.cs" />
     <Compile Include="Areas\Assets\Thumbnail.ashx.cs">
       <DependentUpon>Thumbnail.ashx</DependentUpon>
     </Compile>
@@ -86,8 +87,40 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Assets\Default.aspx" />
+    <Content Include="Areas\Assets\images\closed_folder_16.png" />
+    <Content Include="Areas\Assets\images\closed_folder_24.png" />
+    <Content Include="Areas\Assets\images\closed_folder_32.png" />
+    <Content Include="Areas\Assets\images\closed_folder_48.png" />
     <Content Include="Areas\Assets\images\default_thumb.jpg" />
+    <Content Include="Areas\Assets\images\disk_16.png" />
+    <Content Include="Areas\Assets\images\disk_24.png" />
+    <Content Include="Areas\Assets\images\disk_32.png" />
+    <Content Include="Areas\Assets\images\disk_48.png" />
+    <Content Include="Areas\Assets\images\image_16.png" />
+    <Content Include="Areas\Assets\images\image_24.png" />
+    <Content Include="Areas\Assets\images\image_32.png" />
+    <Content Include="Areas\Assets\images\image_48.png" />
+    <Content Include="Areas\Assets\images\open_folder_16.png" />
+    <Content Include="Areas\Assets\images\open_folder_24.png" />
+    <Content Include="Areas\Assets\images\open_folder_32.png" />
+    <Content Include="Areas\Assets\images\open_folder_48.png" />
     <Content Include="Areas\Assets\images\pbar-ani.gif" />
+    <Content Include="Areas\Assets\images\plain_file_16.png" />
+    <Content Include="Areas\Assets\images\plain_file_24.png" />
+    <Content Include="Areas\Assets\images\plain_file_32.png" />
+    <Content Include="Areas\Assets\images\plain_file_48.png" />
+    <Content Include="Areas\Assets\images\rich_text_file_16.png" />
+    <Content Include="Areas\Assets\images\rich_text_file_24.png" />
+    <Content Include="Areas\Assets\images\rich_text_file_32.png" />
+    <Content Include="Areas\Assets\images\rich_text_file_48.png" />
+    <Content Include="Areas\Assets\images\text_file_16.png" />
+    <Content Include="Areas\Assets\images\text_file_24.png" />
+    <Content Include="Areas\Assets\images\text_file_32.png" />
+    <Content Include="Areas\Assets\images\text_file_48.png" />
+    <Content Include="Areas\Assets\images\up_16.png" />
+    <Content Include="Areas\Assets\images\up_24.png" />
+    <Content Include="Areas\Assets\images\up_32.png" />
+    <Content Include="Areas\Assets\images\up_48.png" />
     <Content Include="Areas\Assets\scripts\application.js" />
     <Content Include="Areas\Assets\scripts\jquery.fileupload-ui.js" />
     <Content Include="Areas\Assets\scripts\jquery.fileupload.js" />
@@ -176,6 +209,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web.config.template" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

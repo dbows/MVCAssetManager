@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
+using System;
 
 namespace AssetManager {
 	public class FileTransferHandler : IHttpHandler {
@@ -12,6 +13,9 @@ namespace AssetManager {
 		public string StorageRoot {
 			get { return ConfigurationManager.AppSettings["Assets_LocalStorageRoot"]; }
 		}
+        public string StorageType {
+			get { return ConfigurationManager.AppSettings["Assets_StorageLocation"]; }
+        }
 		public bool IsReusable { get { return false; } }
 
 		public void ProcessRequest (HttpContext context) {
@@ -57,7 +61,8 @@ namespace AssetManager {
 
 		// Delete file from the server
 		private void DeleteFile (HttpContext context) {
-			var filePath = StorageRoot + context.Request["f"];
+			var filePath = StorageRoot + HttpUtility.UrlDecode(context.Request["f"]);
+
 			if (File.Exists(filePath)) {
 				File.Delete(filePath);
 			}
@@ -101,6 +106,7 @@ namespace AssetManager {
 		private void UploadWholeFile (HttpContext context, List<FilesStatus> statuses) {
 			for (int i = 0; i < context.Request.Files.Count; i++) {
 				var file = context.Request.Files[i];
+                
 				file.SaveAs(StorageRoot + Path.GetFileName(file.FileName));
 
 				string fullName = Path.GetFileName(file.FileName);
@@ -128,7 +134,7 @@ namespace AssetManager {
 		}
 
 		private void DeliverFile (HttpContext context) {
-			var filename = context.Request["f"];
+			var filename = HttpUtility.UrlDecode(context.Request["f"]);
 			var filePath = StorageRoot + filename;
 
 			if (File.Exists(filePath)) {
@@ -141,17 +147,42 @@ namespace AssetManager {
 		}
 
 		private void ListCurrentFiles (HttpContext context) {
-			var files =
-				new DirectoryInfo(StorageRoot)
-					.GetFiles("*", SearchOption.TopDirectoryOnly)
-					.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden))
-					.Select(f => new FilesStatus(f))
-					.ToArray();
+            
+            
+			FilesStatus[] files;
+            switch (StorageType)
+            {
+                case "Amazon":
+                    files = GetAmazonFiles(StorageRoot);
+                    break;
+                default:
+                    files = GetLocalFiles(StorageRoot);
+                    break;
+            }
 
+
+            
 			string jsonObj = js.Serialize(files);
 			context.Response.AddHeader("Content-Disposition", "inline, filename=\"files.json\"");
 			context.Response.Write(jsonObj);
 			context.Response.ContentType = "application/json";
 		}
+
+        private FilesStatus[] GetAmazonFiles(string rootPath){
+            
+ 			return	new DirectoryInfo(rootPath)
+					.GetFiles("*", SearchOption.TopDirectoryOnly)
+					.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden))
+					.Select(f => new FilesStatus(f))
+					.ToArray();       
+        }
+
+        private FilesStatus[] GetLocalFiles(string rootPath){
+ 			return	new DirectoryInfo(rootPath)
+					.GetFiles("*", SearchOption.TopDirectoryOnly)
+					.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden))
+					.Select(f => new FilesStatus(f))
+					.ToArray();       
+        }
 	}
 }
