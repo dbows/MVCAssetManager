@@ -10,12 +10,18 @@
     <add key="RouteDebugger:Enabled" value="false"/>
     <add key="Assets_LocalStorageRoot" value="C:\temp\"/>
     <add key="FileLocation" value="Amazon"/>
-    <add key="Assets_HandlerPath" value="~/Areas/Assets/"/>
-      <add key="Assets_DefaultThumbPath" value="~/Areas/Assets/images"/>
-      <add key="Assets_Amazon_Secret" value=""/>
-      <add key="Assets_Amazon_Key" value=""/>
-      <add key="Assets_Amazon_Bucket" value=""/>
-      <add key="Assets_PathTemplate" value=""/>
+      <add key="Assets_Amazon_HandlerPath" value="~/Areas/Assets/"/>
+      <add key="Assets_Amazon_DefaultThumbPath" value="~/Areas/Assets/images"/>
+      <add key="Assets_Amazon_Secret" value="[YOUR AMAZON SECRET]"/>
+      <add key="Assets_Amazon_Key" value="[YOUR AMAZON KEY]"/>
+      <add key="Assets_Amazon_Bucket" value="[YOUR BUCKET]"/>
+      <add key="Assets_Amazon_Prefix" value="[YOUR KEY PATH]"/>
+      <add key="Assets_Amazon_BaseUrl" value="http://{0}.s3.amazonaws.com/{1}"/>
+      <add key="Assets_Amazon_IconSize" value="48"/>
+      <add key="Assets_Amazon_ShowImageIcons" value="true"/>
+      <add key="Assets_Amazon_DocExtensions" value="(\.|\/)(xlsx?|pptx?|pdf|docx?|txt|csv|vsd|psd|ai)$" />
+      <add key="Assets_Amazon_ImageExtensions" value="(\.|\/)(gif|jpe?g|png)$"/>
+      <add key="Assets_Amazon_MediaExtensions" value="(\.|\/)(aac|mp3|flac|mov|mpeg4|m4p)$"/>
   </appSettings>
   <system.web>
     <compilation debug="true" targetFramework="4.0">
