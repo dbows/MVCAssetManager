@@ -6,7 +6,7 @@ using System;
 using System.Drawing.Imaging;
 
 namespace AssetManager {
-	public class Thumbnail : IHttpHandler {
+	public class AmazonThumbnail : IHttpHandler {
 
 		public string StorageRoot {
 			get { return ConfigurationManager.AppSettings["Assets_LocalStorageRoot"]; }

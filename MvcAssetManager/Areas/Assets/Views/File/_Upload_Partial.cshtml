@@ -1,32 +1,11 @@
-﻿<%@ Page Language="C#" Inherits="System.Web.UI.Page" %>
-<!DOCTYPE HTML>
-<!--
-/*
- * jQuery File Upload Plugin HTML Example 5.0.5
- * https://github.com/blueimp/jQuery-File-Upload
- *
- * Copyright 2010, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * http://creativecommons.org/licenses/MIT/
- */
--->
-<html lang="en" class="no-js">
-<head>
-<meta charset="utf-8">
-<title>jQuery File Upload Example</title>
-<!--[if lt IE 9]>
-<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/base/jquery-ui.css" id="theme" />
-<link rel="stylesheet" href="styles/Default/jquery.fileupload-ui.css" />
-<link rel="stylesheet" href="styles/Default/style.css" />
-</head>
-<body>
+﻿
 <div id="fileupload">
-    <form action="FileTransferHandler.ashx" method="post" enctype="multipart/form-data">
-        <div class="fileupload-buttonbar">
+    <form action="@Url.Content("~/Areas/Assets/AmazonTransferHandler.ashx")" method="post" enctype="multipart/form-data">
+        @Html.Hidden("prefixid",@ViewContext.RouteData.Values["prefixid"])
+        @Html.Hidden("prefix",@ViewContext.RouteData.Values["prefix"])
+        @Html.Hidden("doctype",@ViewContext.RouteData.Values["doctype"])
+        @Html.Hidden("retfun",@ViewContext.RequestContext.HttpContext.Request.Params["retfun"])
+                <div class="fileupload-buttonbar">
             <label class="fileinput-button">
                 <span>Add files...</span>
                 <input type="file" name="files[]" multiple="multiple" />
@@ -84,15 +63,18 @@
                 {{/if}}
             </td>
         {{else}}
+            <td class="chooser">
+                <button onclick="imgSelected(JSON.stringify({'name':'${name}','url':'${url}','thumburl':'${thumbnail_url}','size':'${sizef}','width':'${imgheight}','height':'${imgwidth}'}));">Select</button>
+            </td>
             <td class="preview">
                 {{if thumbnail_url}}
-                    <a href="${url}" target="_blank"><img src="${thumbnail_url}"></a>
+                    <img src="${thumbnail_url}">
                 {{/if}}
             </td>
             <td class="name">
-                <a href="${url}"{{if thumbnail_url}} target="_blank"{{/if}}>${name}</a>
+                ${name}
             </td>
-            <td class="size">${sizef}</td>
+            <td class="size">${sizef}{{if imgheight > 0}} (${imgheight}&times;${imgwidth}){{/if}}</td>
             <td colspan="2"></td>
         {{/if}}
         <td class="delete">
@@ -100,12 +82,3 @@
         </td>
     </tr>
 </script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
-<script src="//ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-<script src="scripts/Default/jquery.iframe-transport.js"></script>
-<script src="scripts/Default/jquery.fileupload.js"></script>
-<script src="scripts/Default/jquery.fileupload-ui.js"></script>
-<script src="scripts/Default/application.js"></script>
-</body> 
-</html>

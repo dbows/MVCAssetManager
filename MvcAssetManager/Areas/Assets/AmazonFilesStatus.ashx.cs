@@ -2,12 +2,15 @@
 using System.Configuration;
 using System.Web;
 using System;
+using Amazon.S3.Model;
+using System.Text.RegularExpressions;
 
 namespace AssetManager {
-	public class FilesStatus {
-		public string HandlerPath = VirtualPathUtility.ToAbsolute(ConfigurationManager.AppSettings["Assets_HandlerPath"]);
-        public string IconPath = VirtualPathUtility.RemoveTrailingSlash(VirtualPathUtility.ToAbsolute(ConfigurationManager.AppSettings["Assets_DefaultThumbPath"]));
-        public int IconSize = int.Parse(ConfigurationManager.AppSettings["Assets_IconSize"]);
+	public class AmazonFilesStatus {
+		public string HandlerPath = VirtualPathUtility.ToAbsolute(ConfigurationManager.AppSettings["Assets_Amazon_HandlerPath"]);
+        public string IconPath = VirtualPathUtility.RemoveTrailingSlash(VirtualPathUtility.ToAbsolute(ConfigurationManager.AppSettings["Assets_Amazon_DefaultThumbPath"]));
+        public int IconSize = int.Parse(ConfigurationManager.AppSettings["Assets_Amazon_IconSize"]);
+        public bool ShowImageIcons = bool.TrueString.ToLower() == ConfigurationManager.AppSettings["Assets_Amazon_ShowImageIcons"].ToLower() ? true : false;
 
 		public string group { get; set; }
 		public string name { get; set; }
@@ -19,28 +22,57 @@ namespace AssetManager {
 		public string delete_url { get; set; }
 		public string delete_type { get; set; }
 		public string error { get; set; }
+        public bool isimage {get;set;}
+        public int imgheight {get;set;}
+        public int imgwidth {get;set;}
 
-		public FilesStatus () { }
+        public AmazonFilesStatus(S3Object s3File,string bucket,string prefix)
+        {
 
-		public FilesStatus (FileInfo fileInfo) { SetValues(fileInfo.Name, (int)fileInfo.Length); }
+            var filename = s3File.Key.Replace(prefix,"");
+            var fileExt = filename.Remove(0,filename.LastIndexOf('.'));
+            type =  getContentTypeByExtension(fileExt);
+            isimage =  Regex.Match(filename.ToLower(),AmazonHelper.ImgExtensions()).Success;
+            var client = AmazonHelper.GetS3Client();
+            var metareq = new GetObjectMetadataRequest().WithBucketName(bucket).WithKey(s3File.Key);
+            var meta = client.GetObjectMetadata(metareq);                
+            var height = 0;
+            var width = 0;
+            if(isimage){
+                height = String.IsNullOrWhiteSpace(meta.Headers["x-amz-meta-height"])? 0 : Int32.Parse(meta.Headers["x-amz-meta-height"]);
+                 width = String.IsNullOrWhiteSpace(meta.Headers["x-amz-meta-width"])? 0 : Int32.Parse(meta.Headers["x-amz-meta-width"]);
 
-		public FilesStatus (string fileName, int fileLength) { SetValues(fileName, fileLength); }
-		public FilesStatus (string fileName, int fileLength,string mimeType) { SetValues(fileName, fileLength,mimeType); }
+            }
+            
+            var size = Convert.ToInt32(s3File.Size);
+            
+            SetValues(filename,bucket,prefix,size,height,width);
+        }
+        public AmazonFilesStatus (string filename,string bucket,string prefix,Int32 filesize,Int32 height = 0,Int32 width = 0)
+        {
+            SetValues(filename,bucket,prefix,filesize,height,width);
+        }
 
-		public void SetValues (string fileName, int fileLength,string mimeType = "") {
-            fileName = fileName.ToLower();
-			name = fileName;
-			var fileExt = fileName.Remove(0,fileName.LastIndexOf('.'));
-			type = string.IsNullOrWhiteSpace(mimeType) ? getContentTypeByExtension(fileExt) : mimeType;
-			size = fileLength;
-			progress = "1.0";
-			url = HandlerPath + "FileTransferHandler.ashx?f=" + HttpUtility.UrlEncode(fileName);
+        public void SetValues (string filename,string bucket,string prefix,Int32 filesize,Int32 height = 0,Int32 width = 0){
+            
+            var baseUrl = ConfigurationManager.AppSettings["Assets_Amazon_BaseUrl"];
+            baseUrl = String.Format(baseUrl,bucket,prefix);
+            var fileExt = filename.Remove(0,filename.LastIndexOf('.'));
+            type =  getContentTypeByExtension(fileExt);
             var thumbFile = getIconByExtension(fileExt);
-            //If the thumbFile is "image" then thumbnail the image else just use the default icon for the file type.
-			thumbnail_url = thumbFile == "image" ? HandlerPath + "Thumbnail.ashx?f=" + HttpUtility.UrlEncode(fileName) : IconPath + "/" + thumbFile;
-			delete_url = HandlerPath + "FileTransferHandler.ashx?f=" + HttpUtility.UrlEncode(fileName);
-			delete_type = "DELETE";
-		}
+            name = filename;
+            progress = "1.0";
+            size = filesize;
+            url = VirtualPathUtility.RemoveTrailingSlash(baseUrl) + "/" + filename;
+            delete_type = "DELETE";
+            delete_url = VirtualPathUtility.RemoveTrailingSlash(HandlerPath) + "/" + "AmazonTransferHandler.ashx?f=" + HttpUtility.UrlEncode(filename);
+            type = type;
+            imgheight = height;
+            imgwidth = width;
+            thumbnail_url = thumbFile == "image" ? VirtualPathUtility.RemoveTrailingSlash(baseUrl) + "/thumbs/" + filename.ToLower().Replace(fileExt.ToLower(),".png") : VirtualPathUtility.RemoveTrailingSlash(IconPath) + "/" + thumbFile;       
+        }
+
+
         private string getIconByExtension(string strExtension,int size = 48)
         {
             string returnTemplate = "plain_file_{0}.png";
@@ -48,12 +80,38 @@ namespace AssetManager {
             switch (strExtension)
             {
                 case ".pdf": 
-                    returnTemplate =  "rich_text_file_{0}.png";
+                    returnTemplate =  "pdf_{0}.jpg";
                     break;
-                //case ".tar":
-                //    return "application/x-tar";
-                //case ".zip":
-                //    return "application/x-zip-compressed";
+                case ".doc": 
+                    returnTemplate =  "word_{0}.jpg";
+                    break;
+                 case ".docx": 
+                    returnTemplate =  "word_{0}.jpg";
+                    break;                             
+                 case ".ppt": 
+                    returnTemplate =  "ppt_{0}.jpg";
+                    break;               
+                  case ".pptx": 
+                    returnTemplate =  "ppt_{0}.jpg";
+                    break;              
+                  case ".vsd": 
+                    returnTemplate =  "visio_{0}.jpg";
+                    break;             
+                  case ".xls": 
+                    returnTemplate =  "excel_{0}.jpg";
+                    break;             
+                  case ".xlsx": 
+                    returnTemplate =  "excel_{0}.jpg";
+                    break;             
+                  case ".ai": 
+                    returnTemplate =  "ai_{0}.jpg";
+                    break;             
+                  case ".psd": 
+                    returnTemplate =  "ps_{0}.jpg";
+                    break;                       
+                  case ".csv": 
+                    returnTemplate =  "text_file_{0}.jpg";
+                    break;        
 
                 case ".aiff":
                     returnTemplate =  "disk_{0}.png";
@@ -83,13 +141,13 @@ namespace AssetManager {
                     returnTemplate =  "image_{0}.png";
                     break;
                 case ".gif":
-                    returnTemplate =  "image";
+                    returnTemplate =  ShowImageIcons ? "image" : "image_{0}.png";
                     break;
                 case ".jpg":
-                    returnTemplate =  "image";
+                    returnTemplate =   ShowImageIcons ? "image" : "image_{0}.png";
                     break;
                 case ".png":
-                    returnTemplate =  "image";
+                    returnTemplate =   ShowImageIcons ? "image" : "image_{0}.png";
                     break;
                 case ".tiff":
                     returnTemplate =  "image_{0}.png";

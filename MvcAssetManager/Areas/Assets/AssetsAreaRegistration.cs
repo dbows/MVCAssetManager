@@ -16,8 +16,8 @@ namespace MvcAssetManager.Areas.Assets
         {
             context.MapRoute(
                 "Assets_default",
-                "Assets/{controller}/{action}/{id}",
-                new {controller="File", action = "Index", id = UrlParameter.Optional }
+                "Assets/{action}/{prefix}/{prefixid}/{doctype}",
+                new {controller="File", action = "Index",prefix = UrlParameter.Optional, prefixid = UrlParameter.Optional,doctype= UrlParameter.Optional }
             );
         }
     }

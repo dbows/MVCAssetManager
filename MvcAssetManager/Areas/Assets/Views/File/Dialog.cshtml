@@ -1,14 +1,28 @@
 ﻿@{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Dialog";
+    Layout = "~/Areas/Assets/Views/Shared/_Dialog_Layout.cshtml";
 }
 
-<h2>Asset List</h2>
+<h2>Choose or Upload An Image</h2>
 @{Html.RenderPartial("_Upload_Partial");}
+
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
     <script src="@Url.Content("~/Areas/Assets/scripts/jquery.iframe-transport.js")"></script>
     <script src="@Url.Content("~/Areas/Assets/scripts/jquery.fileupload.js")"></script>
     <script src="@Url.Content("~/Areas/Assets/scripts/jquery.fileupload-ui.js")"></script>
     <script src="@Url.Content("~/Areas/Assets/scripts/application.js")"></script>
+
+    <script type="text/javascript">
+        imgSelected = function (img,thumburl)
+        {
+            var funcName = "this.content." + $("#retfun").val() + "('" + img + "','" + thumburl + "')";
+
+            $.globalEval(funcName)
+            parent.$.fancybox.close();
+
+
+        }
+    </script>
 
 

@@ -66,3 +66,14 @@ textarea
 {
     display: none;
 }
+.uploadTarget {
+    display:inline-block;
+    width:400px;
+    height:150px;
+    background-color:#fff;
+    color:#000;
+    margin-top:5px;
+} 
+.uploadTarget a {
+    float:left;
+}

@@ -16,5 +16,11 @@ namespace MvcAssetManager.Areas.Assets.Controllers
             return View();
         }
 
+        public ActionResult Dialog()
+        {
+            return View();
+        }
+
+
     }
 }

@@ -21,11 +21,11 @@ namespace MvcAssetManager
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute(
-                "Assets", // Route name
-                "Assets/{controller}/{action}/{id}", // URL with parameters
-                new {controller = "File", action = "Index", id = UrlParameter.Optional } // Parameter defaults
-            );
+            //routes.MapRoute(
+            //    "Assets", // Route name
+            //    "Assets/{controller}/{action}/{id}", // URL with parameters
+            //    new {controller = "File", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+            //);
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
